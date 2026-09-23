@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>O Jogo do Silêncio</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0f;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    h1 {
+      margin: 12px 0 4px;
+      font-size: 1.6rem;
+      letter-spacing: 2px;
+      color: #c9b1ff;
+      text-shadow: 0 0 12px #7b5cff55;
+    }
+    .subtitle {
+      font-size: 0.85rem;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    #game-container {
+      position: relative;
+      border: 3px solid #3a2a5a;
+      border-radius: 8px;
+      box-shadow: 0 0 30px #7b5cff33;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      background: #12121a;
+    }
+    #ui {
+      width: 800px;
+      max-width: 95vw;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .noise-bar-container {
+      background: #1a1a25;
+      border-radius: 6px;
+      height: 18px;
+      overflow: hidden;
+      border: 1px solid #3a2a5a;
+    }
+    #noise-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #4caf50, #ffeb3b, #f44336);
+      transition: width 0.15s;
+    }
+    .emoji-panel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      background: #16161f;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #3a2a5a;
+    }
+    .emoji-btn {
+      font-size: 1.6rem;
+      background: #2a2a3a;
+      border: none;
+      border-radius: 8px;
+      width: 48px;
+      height: 48px;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.15s;
+    }
+    .emoji-btn:hover { background: #3a3a50; transform: scale(1.1); }
+    .emoji-btn:active { transform: scale(0.95); }
+    #messages {
+      height: 60px;
+      background: #12121a;
+      border-radius: 6px;
+      padding: 6px 10px;
+      overflow-y: auto;
+      font-size: 1.4rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      border: 1px solid #2a2a3a;
+    }
+    .msg {
+      animation: fadeIn 0.3s;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.5); } }
+    #status {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #aaa;
+      min-height: 24px;
+    }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    .overlay h2 { font-size: 2.2rem; margin-bottom: 12px; color: #c9b1ff; }
+    .overlay p { max-width: 400px; line-height: 1.5; margin-bottom: 16px; }
+    .overlay button {
+      padding: 12px 28px;
+      font-size: 1.1rem;
+      background: #7b5cff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .overlay button:hover { background: #9b7cff; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <h1>🤫 O JOGO DO SILÊNCIO</h1>
+  <div class="subtitle">Comunique-se apenas com emojis • Não faça barulho</div>
+
+  <div id="game-container">
+    <canvas id="game" width="800" height="500"></canvas>
+
+    <div id="start-screen" class="overlay">
+      <h2>O Jogo do Silêncio</h2>
+      <p>Vocês estão presos em uma casa amaldiçoada.<br>
+      Qualquer som alto atrai o <strong>Guardião do Silêncio</strong>.<br><br>
+      <strong>Regra de ouro:</strong> não falem e não digitem.<br>
+      Usem apenas os emojis para se entender.</p>
+      <p style="font-size:0.9rem;color:#aaa">
+        Jogador 1 (azul): WASD + E<br>
+        Jogador 2 (vermelho): Setas + Enter
+      </p>
+      <button onclick="startGame()">Começar em Silêncio</button>
+    </div>
+
+    <div id="win-screen" class="overlay hidden">
+      <h2>Vocês escaparam!</h2>
+      <p>O silêncio foi mantido... por enquanto.</p>
+      <button onclick="location.reload()">Jogar de novo</button>
+    </div>
+
+    <div id="lose-screen" class="overlay hidden">
+      <h2>O Guardião ouviu...</h2>
+      <p>Vocês fizeram barulho demais.<br>O silêncio foi quebrado.</p>
+      <button onclick="location.reload()">Tentar novamente</button>
+    </div>
+  </div>
+
+  <div id="ui">
+    <div class="noise-bar-container">
+      <div id="noise-bar"></div>
+    </div>
+    <div id="status">Medidor de Barulho</div>
+    <div id="messages"></div>
+    <div class="emoji-panel" id="emoji-panel">
+      <!-- emojis gerados via JS -->
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    const noiseBar = document.getElementById('noise-bar');
+    const statusEl = document.getElementById('status');
+    const messagesEl = document.getElementById('messages');
+    const emojiPanel = document.getElementById('emoji-panel');
+
+    // Emojis disponíveis
+    const EMOJIS = ['👆','👇','👈','👉','🔑','🚪','❗','❓','👀','🤫','🏃','🧍','✅','❌','💡','🔄','1️⃣','2️⃣'];
+
+    EMOJIS.forEach(e => {
+      const btn = document.createElement('button');
+      btn.className = 'emoji-btn';
+      btn.textContent = e;
+      btn.onclick = () => sendEmoji(e);
+      emojiPanel.appendChild(btn);
+    });
+
+    // Estado do jogo
+    let gameStarted = false;
+    let gameOver = false;
+    let noise = 0;
+    const MAX_NOISE = 100;
+
+    // Jogadores
+    const p1 = { x: 120, y: 250, color: '#4fc3f7', radius: 16, name: 'P1' };
+    const p2 = { x: 180, y: 250, color: '#ef5350', radius: 16, name: 'P2' };
+
+    // Mundo
+    const walls = [];
+    const interactables = [];
+    let currentRoom = 0; // 0 = sala, 1 = cozinha, 2 = saída
+
+    // Teclas
+    const keys = {};
+
+    // Criar mapa simples
+    function buildMap() {
+      walls.length = 0;
+      interactables.length = 0;
+
+      // Bordas da tela
+      walls.push({x:0,y:0,w:800,h:20}, {x:0,y:480,w:800,h:20}, {x:0,y:0,w:20,h:500}, {x:780,y:0,w:20,h:500});
+
+      if (currentRoom === 0) {
+        // Sala de estar
+        // Parede do meio com porta
+        walls.push({x:380, y:20, w:20, h:180});
+        walls.push({x:380, y:300, w:20, h:180});
+
+        // Placa de pressão
+        interactables.push({
+          type: 'plate',
+          x: 100, y: 380, w: 50, h: 50,
+          active: false,
+          id: 'plate1'
+        });
+
+        // Alavanca
+        interactables.push({
+          type: 'lever',
+          x: 650, y: 120, w: 30, h: 40,
+          active: false,
+          id: 'lever1'
+        });
+
+        // Porta (inicialmente fechada)
+        interactables.push({
+          type: 'door',
+          x: 380, y: 200, w: 20, h: 100,
+          open: false,
+          id: 'door1',
+          requires: ['plate1', 'lever1']
+        });
+      } else if (currentRoom === 1) {
+        // Cozinha
+        walls.push({x:380, y:20, w:20, h:180});
+        walls.push({x:380, y:300, w:20, h:180});
+
+        interactables.push({
+          type: 'key',
+          x: 600, y: 350, w: 30, h: 30,
+          collected: false,
+          id: 'key1'
+        });
+
+        interactables.push({
+          type: 'door',
+          x: 380, y: 200, w: 20, h: 100,
+          open: false,
+          id: 'door2',
+          requiresKey: true
+        });
+      } else if (currentRoom === 2) {
+        // Saída
+        interactables.push({
+          type: 'exit',
+          x: 650, y: 200, w: 80, h: 100,
+          id: 'exit'
+        });
+      }
+    }
+
+    function startGame() {
+      document.getElementById('start-screen').classList.add('hidden');
+      gameStarted = true;
+      buildMap();
+      requestAnimationFrame(loop);
+    }
+
+    function sendEmoji(emoji) {
+      if (!gameStarted || gameOver) return;
+      const span = document.createElement('span');
+      span.className = 'msg';
+      span.textContent = emoji;
+      messagesEl.appendChild(span);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      // Limitar mensagens
+      if (messagesEl.children.length > 12) {
+        messagesEl.removeChild(messagesEl.firstChild);
+      }
+    }
+
+    function addNoise(amount) {
+      noise = Math.min(MAX_NOISE, noise + amount);
+      noiseBar.style.width = noise + '%';
+      if (noise >= MAX_NOISE) {
+        lose();
+      }
+    }
+
+    function lose() {
+      gameOver = true;
+      document.getElementById('lose-screen').classList.remove('hidden');
+    }
+
+    function win() {
+      gameOver = true;
+      document.getElementById('win-screen').classList.remove('hidden');
+    }
+
+    // Colisão simples AABB
+    function collides(a, b) {
+      return a.x < b.x + b.w && a.x + (a.radius*2 || a.w) > b.x &&
+             a.y < b.y + b.h && a.y + (a.radius*2 || a.h) > b.y;
+    }
+
+    function playerRect(p) {
+      return { x: p.x - p.radius, y: p.y - p.radius, w: p.radius*2, h: p.radius*2 };
+    }
+
+    function movePlayer(p, dx, dy) {
+      const speed = 2.8;
+      let nx = p.x + dx * speed;
+      let ny = p.y + dy * speed;
+
+      // Testar colisão com paredes
+      const test = { x: nx - p.radius, y: ny - p.radius, w: p.radius*2, h: p.radius*2 };
+      let hit = false;
+      for (const w of walls) {
+        if (collides(test, w)) { hit = true; break; }
+      }
+      // Porta fechada também bloqueia
+      for (const i of interactables) {
+        if (i.type === 'door' && !i.open && collides(test, i)) { hit = true; break; }
+      }
+
+      if (!hit) {
+        p.x = nx;
+        p.y = ny;
+        // Pequeno barulho ao andar
+        if (dx !== 0 || dy !== 0) addNoise(0.04);
+      }
+    }
+
+    function tryInteract(p) {
+      const pr = playerRect(p);
+      for (const obj of interactables) {
+        if (collides(pr, obj)) {
+          if (obj.type === 'plate') {
+            obj.active = true;
+            statusEl.textContent = 'Placa de pressão ativada!';
+            checkDoor();
+          } else if (obj.type === 'lever') {
+            obj.active = !obj.active;
+            addNoise(3);
+            statusEl.textContent = obj.active ? 'Alavanca puxada!' : 'Alavanca desativada';
+            checkDoor();
+          } else if (obj.type === 'key' && !obj.collected) {
+            obj.collected = true;
+            p.hasKey = true;
+            statusEl.textContent = p.name + ' pegou a chave! 🔑';
+            addNoise(2);
+          } else if (obj.type === 'door' && obj.requiresKey) {
+            if (p.hasKey) {
+              obj.open = true;
+              statusEl.textContent = 'Porta destrancada!';
+              addNoise(4);
+              setTimeout(() => {
+                currentRoom = 2;
+                p1.x = 100; p1.y = 250;
+                p2.x = 160; p2.y = 250;
+                buildMap();
+              }, 800);
+            } else {
+              statusEl.textContent = 'Precisa da chave...';
+              addNoise(1);
+            }
+          } else if (obj.type === 'exit') {
+            win();
+          }
+        }
+      }
+    }
+
+    function checkDoor() {
+      const plate = interactables.find(i => i.id === 'plate1');
+      const lever = interactables.find(i => i.id === 'lever1');
+      const door = interactables.find(i => i.id === 'door1');
+      if (plate && lever && door) {
+        if (plate.active && lever.active) {
+          door.open = true;
+          statusEl.textContent = 'Porta aberta! Passem...';
+          setTimeout(() => {
+            currentRoom = 1;
+            p1.x = 100; p1.y = 250;
+            p2.x = 160; p2.y = 250;
+            p1.hasKey = false; p2.hasKey = false;
+            buildMap();
+          }, 900);
+        }
+      }
+    }
+
+    // Manter placa ativa só se alguém estiver em cima
+    function updatePlates() {
+      for (const obj of interactables) {
+        if (obj.type === 'plate') {
+          const pr1 = playerRect(p1);
+          const pr2 = playerRect(p2);
+          obj.active = collides(pr1, obj) || collides(pr2, obj);
+        }
+      }
+      checkDoor();
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Chão
+      ctx.fillStyle = '#1a1a28';
+      ctx.fillRect(0, 0, 800, 500);
+
+      // Grade sutil
+      ctx.strokeStyle = '#222233';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < 800; x += 40) {
+        ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,500); ctx.stroke();
+      }
+      for (let y = 0; y < 500; y += 40) {
+        ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(800,y); ctx.stroke();
+      }
+
+      // Paredes
+      ctx.fillStyle = '#2e2e42';
+      walls.forEach(w => ctx.fillRect(w.x, w.y, w.w, w.h));
+
+      // Interagíveis
+      interactables.forEach(obj => {
+        if (obj.type === 'plate') {
+          ctx.fillStyle = obj.active ? '#66bb6a' : '#455a64';
+          ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
+          ctx.fillStyle = '#fff';
+          ctx.font = '12px sans-serif';
+          ctx.fillText('PLACA', obj.x + 6, obj.y + 28);
+        } else if (obj.type === 'lever') {
+          ctx.fillStyle = obj.active ? '#ffca28' : '#78909c';
+          ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
+          ctx.fillStyle = '#fff';
+          ctx.font = '11px sans-serif';
+          ctx.fillText('ALAV.', obj.x - 2, obj.y - 6);
+        } else if (obj.type === 'door') {
+          if (!obj.open) {
+            ctx.fillStyle = '#5d4037';
+            ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
+          }
+        } else if (obj.type === 'key' && !obj.collected) {
+          ctx.font = '28px serif';
+          ctx.fillText('🔑', obj.x, obj.y + 28);
+        } else if (obj.type === 'exit') {
+          ctx.fillStyle = '#2e7d32';
+          ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
+          ctx.fillStyle = '#fff';
+          ctx.font = 'bold 16px sans-serif';
+          ctx.fillText('SAÍDA', obj.x + 12, obj.y + 55);
+        }
+      });
+
+      // Jogadores
+      [p1, p2].forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Nome
+        ctx.fillStyle = '#fff';
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(p.name, p.x, p.y - 22);
+
+        // Chave
+        if (p.hasKey) {
+          ctx.font = '16px serif';
+          ctx.fillText('🔑', p.x + 18, p.y - 10);
+        }
+      });
+
+      // Indicador de sala
+      ctx.fillStyle = '#c9b1ff';
+      ctx.font = '14px sans-serif';
+      ctx.textAlign = 'left';
+      const roomNames = ['Sala de Estar', 'Cozinha', 'Corredor da Saída'];
+      ctx.fillText(roomNames[currentRoom] || '', 30, 40);
+    }
+
+    function loop() {
+      if (!gameStarted || gameOver) return;
+
+      // Movimento
+      let dx1 = 0, dy1 = 0;
+      if (keys['w'] || keys['W']) dy1 = -1;
+      if (keys['s'] || keys['S']) dy1 = 1;
+      if (keys['a'] || keys['A']) dx1 = -1;
+      if (keys['d'] || keys['D']) dx1 = 1;
+      movePlayer(p1, dx1, dy1);
+
+      let dx2 = 0, dy2 = 0;
+      if (keys['ArrowUp']) dy2 = -1;
+      if (keys['ArrowDown']) dy2 = 1;
+      if (keys['ArrowLeft']) dx2 = -1;
+      if (keys['ArrowRight']) dx2 = 1;
+      movePlayer(p2, dx2, dy2);
+
+      updatePlates();
+
+      // Decair barulho lentamente
+      if (noise > 0) {
+        noise = Math.max(0, noise - 0.08);
+        noiseBar.style.width = noise + '%';
+      }
+
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    // Eventos de teclado
+    window.addEventListener('keydown', e => {
+      keys[e.key] = true;
+      if (!gameStarted || gameOver) return;
+
+      if (e.key === 'e' || e.key === 'E') {
+        tryInteract(p1);
+        e.preventDefault();
+      }
+      if (e.key === 'Enter') {
+        tryInteract(p2);
+        e.preventDefault();
+      }
+    });
+
+    window.addEventListener('keyup', e => {
+      keys[e.key] = false;
+    });
+
+    // Prevenir scroll com setas
+    window.addEventListener('keydown', e => {
+      if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) {
+        e.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html>
