@@ -7,306 +7,400 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: #0a0a0f;
-      color: #e0e0e0;
+      background: #050508;
+      color: #d0d0d8;
       font-family: 'Segoe UI', system-ui, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      overflow: hidden;
+      overflow-x: hidden;
+      user-select: none;
     }
     h1 {
-      margin: 12px 0 4px;
-      font-size: 1.6rem;
-      letter-spacing: 2px;
-      color: #c9b1ff;
-      text-shadow: 0 0 12px #7b5cff55;
+      margin: 10px 0 2px;
+      font-size: 1.5rem;
+      letter-spacing: 3px;
+      color: #b8a0ff;
+      text-shadow: 0 0 18px #7b5cff66;
     }
     .subtitle {
-      font-size: 0.85rem;
-      color: #888;
+      font-size: 0.8rem;
+      color: #666;
       margin-bottom: 8px;
     }
     #game-container {
       position: relative;
-      border: 3px solid #3a2a5a;
-      border-radius: 8px;
-      box-shadow: 0 0 30px #7b5cff33;
+      border: 2px solid #2a2040;
+      border-radius: 10px;
+      box-shadow: 0 0 40px #5b3cff22, inset 0 0 60px #00000088;
       overflow: hidden;
     }
     canvas {
       display: block;
-      background: #12121a;
+      background: #0c0c12;
     }
     #ui {
-      width: 800px;
-      max-width: 95vw;
+      width: 860px;
+      max-width: 96vw;
       margin-top: 10px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 7px;
+    }
+    .noise-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .noise-label {
+      font-size: 0.75rem;
+      color: #888;
+      min-width: 70px;
     }
     .noise-bar-container {
-      background: #1a1a25;
-      border-radius: 6px;
-      height: 18px;
+      flex: 1;
+      background: #14141c;
+      border-radius: 5px;
+      height: 14px;
       overflow: hidden;
-      border: 1px solid #3a2a5a;
+      border: 1px solid #2a2040;
     }
     #noise-bar {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #4caf50, #ffeb3b, #f44336);
-      transition: width 0.15s;
+      background: linear-gradient(90deg, #2e7d32, #f9a825, #c62828);
+      transition: width 0.12s linear;
+      box-shadow: 0 0 8px currentColor;
+    }
+    #status {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #9a9aaa;
+      min-height: 22px;
+      letter-spacing: 0.3px;
+    }
+    #messages {
+      height: 52px;
+      background: #0e0e14;
+      border-radius: 6px;
+      padding: 5px 10px;
+      overflow-y: auto;
+      font-size: 1.35rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      align-items: center;
+      border: 1px solid #1e1e2a;
+    }
+    .msg {
+      animation: popIn 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .msg .who {
+      font-size: 0.65rem;
+      color: #666;
+      margin-right: 1px;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.4); }
+      to { opacity: 1; transform: scale(1); }
     }
     .emoji-panel {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
+      gap: 5px;
       justify-content: center;
-      background: #16161f;
-      padding: 10px;
+      background: #101018;
+      padding: 8px;
       border-radius: 8px;
-      border: 1px solid #3a2a5a;
+      border: 1px solid #1e1e2a;
     }
     .emoji-btn {
-      font-size: 1.6rem;
-      background: #2a2a3a;
-      border: none;
-      border-radius: 8px;
-      width: 48px;
-      height: 48px;
-      cursor: pointer;
-      transition: transform 0.1s, background 0.15s;
-    }
-    .emoji-btn:hover { background: #3a3a50; transform: scale(1.1); }
-    .emoji-btn:active { transform: scale(0.95); }
-    #messages {
-      height: 60px;
-      background: #12121a;
-      border-radius: 6px;
-      padding: 6px 10px;
-      overflow-y: auto;
-      font-size: 1.4rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      align-items: center;
+      font-size: 1.45rem;
+      background: #1c1c28;
       border: 1px solid #2a2a3a;
+      border-radius: 7px;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.15s, border-color 0.15s;
     }
-    .msg {
-      animation: fadeIn 0.3s;
+    .emoji-btn:hover {
+      background: #2a2a3c;
+      border-color: #5b3cff;
+      transform: scale(1.08);
     }
-    @keyframes fadeIn { from { opacity: 0; transform: scale(0.5); } }
-    #status {
-      text-align: center;
-      font-size: 0.9rem;
-      color: #aaa;
-      min-height: 24px;
-    }
+    .emoji-btn:active { transform: scale(0.92); }
     .overlay {
       position: absolute;
       inset: 0;
-      background: rgba(0,0,0,0.85);
+      background: rgba(5,5,10,0.92);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 10;
-      color: white;
+      z-index: 20;
+      color: #e0e0e8;
       text-align: center;
-      padding: 20px;
+      padding: 24px;
     }
-    .overlay h2 { font-size: 2.2rem; margin-bottom: 12px; color: #c9b1ff; }
-    .overlay p { max-width: 400px; line-height: 1.5; margin-bottom: 16px; }
+    .overlay h2 {
+      font-size: 2rem;
+      margin-bottom: 14px;
+      color: #b8a0ff;
+      text-shadow: 0 0 20px #7b5cff55;
+    }
+    .overlay p {
+      max-width: 420px;
+      line-height: 1.55;
+      margin-bottom: 14px;
+      font-size: 0.95rem;
+      color: #b0b0b8;
+    }
+    .overlay .controls {
+      font-size: 0.82rem;
+      color: #777;
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
     .overlay button {
-      padding: 12px 28px;
-      font-size: 1.1rem;
-      background: #7b5cff;
+      padding: 11px 26px;
+      font-size: 1rem;
+      background: linear-gradient(135deg, #6b4cff, #9b7cff);
       color: white;
       border: none;
       border-radius: 8px;
       cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: transform 0.15s, box-shadow 0.15s;
     }
-    .overlay button:hover { background: #9b7cff; }
+    .overlay button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 18px #7b5cff55;
+    }
     .hidden { display: none !important; }
+    .inv {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: #777;
+    }
+    .inv span { color: #aaa; }
   </style>
 </head>
 <body>
   <h1>🤫 O JOGO DO SILÊNCIO</h1>
-  <div class="subtitle">Comunique-se apenas com emojis • Não faça barulho</div>
+  <div class="subtitle">Comunique-se só com emojis • O barulho mata</div>
 
   <div id="game-container">
-    <canvas id="game" width="800" height="500"></canvas>
+    <canvas id="game" width="860" height="520"></canvas>
 
     <div id="start-screen" class="overlay">
       <h2>O Jogo do Silêncio</h2>
-      <p>Vocês estão presos em uma casa amaldiçoada.<br>
-      Qualquer som alto atrai o <strong>Guardião do Silêncio</strong>.<br><br>
-      <strong>Regra de ouro:</strong> não falem e não digitem.<br>
-      Usem apenas os emojis para se entender.</p>
-      <p style="font-size:0.9rem;color:#aaa">
-        Jogador 1 (azul): WASD + E<br>
-        Jogador 2 (vermelho): Setas + Enter
+      <p>
+        Vocês acordaram presos em uma casa que odeia o som.<br><br>
+        Qualquer ruído alto desperta o <strong>Guardião do Silêncio</strong>.<br><br>
+        A única forma de se entender é pelo painel de emojis.<br>
+        Não falem. Não digitem. Apenas observem e apontem.
       </p>
-      <button onclick="startGame()">Começar em Silêncio</button>
+      <div class="controls">
+        <strong>Jogador 1 (azul)</strong>: WASD + E &nbsp;|&nbsp; Shift para correr<br>
+        <strong>Jogador 2 (vermelho)</strong>: Setas + Enter &nbsp;|&nbsp; Ctrl direito para correr
+      </div>
+      <button onclick="startGame()">Entrar em Silêncio</button>
     </div>
 
     <div id="win-screen" class="overlay hidden">
-      <h2>Vocês escaparam!</h2>
-      <p>O silêncio foi mantido... por enquanto.</p>
+      <h2>Vocês escaparam</h2>
+      <p>O silêncio foi mantido.<br>A casa ainda dorme… por enquanto.</p>
       <button onclick="location.reload()">Jogar de novo</button>
     </div>
 
     <div id="lose-screen" class="overlay hidden">
-      <h2>O Guardião ouviu...</h2>
-      <p>Vocês fizeram barulho demais.<br>O silêncio foi quebrado.</p>
-      <button onclick="location.reload()">Tentar novamente</button>
+      <h2>O Guardião ouviu</h2>
+      <p>O barulho quebrou o pacto.<br>O silêncio foi violado.</p>
+      <button onclick="location.reload()">Tentar outra vez</button>
     </div>
   </div>
 
   <div id="ui">
-    <div class="noise-bar-container">
-      <div id="noise-bar"></div>
+    <div class="noise-row">
+      <div class="noise-label">BARULHO</div>
+      <div class="noise-bar-container"><div id="noise-bar"></div></div>
     </div>
-    <div id="status">Medidor de Barulho</div>
+    <div id="status">Andem devagar. Correr faz barulho.</div>
+    <div class="inv">
+      <div>P1: <span id="inv1">—</span></div>
+      <div>P2: <span id="inv2">—</span></div>
+    </div>
     <div id="messages"></div>
-    <div class="emoji-panel" id="emoji-panel">
-      <!-- emojis gerados via JS -->
-    </div>
+    <div class="emoji-panel" id="emoji-panel"></div>
   </div>
 
   <script>
     const canvas = document.getElementById('game');
     const ctx = canvas.getContext('2d');
+    const W = canvas.width;
+    const H = canvas.height;
     const noiseBar = document.getElementById('noise-bar');
     const statusEl = document.getElementById('status');
     const messagesEl = document.getElementById('messages');
-    const emojiPanel = document.getElementById('emoji-panel');
+    const inv1El = document.getElementById('inv1');
+    const inv2El = document.getElementById('inv2');
 
-    // Emojis disponíveis
-    const EMOJIS = ['👆','👇','👈','👉','🔑','🚪','❗','❓','👀','🤫','🏃','🧍','✅','❌','💡','🔄','1️⃣','2️⃣'];
+    const EMOJIS = ['👆','👇','👈','👉','🔑','🚪','❗','❓','👀','🤫','🏃','🧍','✅','❌','💡','🔄','1️⃣','2️⃣','⚡','🔒'];
 
     EMOJIS.forEach(e => {
       const btn = document.createElement('button');
       btn.className = 'emoji-btn';
       btn.textContent = e;
-      btn.onclick = () => sendEmoji(e);
-      emojiPanel.appendChild(btn);
+      btn.onclick = () => sendEmoji(e, 'ambos');
+      document.getElementById('emoji-panel').appendChild(btn);
     });
 
-    // Estado do jogo
+    // ========== ESTADO ==========
     let gameStarted = false;
     let gameOver = false;
     let noise = 0;
     const MAX_NOISE = 100;
+    let currentRoom = 0;
+    let frame = 0;
+    let shake = 0;
+    let particles = [];
 
-    // Jogadores
-    const p1 = { x: 120, y: 250, color: '#4fc3f7', radius: 16, name: 'P1' };
-    const p2 = { x: 180, y: 250, color: '#ef5350', radius: 16, name: 'P2' };
+    const p1 = { x: 140, y: 260, color: '#4fc3f7', r: 15, name: 'P1', hasKey: false, hasItem: null, sprint: false };
+    const p2 = { x: 200, y: 260, color: '#ef5350', r: 15, name: 'P2', hasKey: false, hasItem: null, sprint: false };
 
-    // Mundo
-    const walls = [];
-    const interactables = [];
-    let currentRoom = 0; // 0 = sala, 1 = cozinha, 2 = saída
-
-    // Teclas
+    let walls = [];
+    let interactables = [];
+    let decorations = [];
     const keys = {};
 
-    // Criar mapa simples
+    // ========== MAPAS ==========
     function buildMap() {
-      walls.length = 0;
-      interactables.length = 0;
+      walls = [];
+      interactables = [];
+      decorations = [];
 
-      // Bordas da tela
-      walls.push({x:0,y:0,w:800,h:20}, {x:0,y:480,w:800,h:20}, {x:0,y:0,w:20,h:500}, {x:780,y:0,w:20,h:500});
+      // bordas
+      walls.push({x:0,y:0,w:W,h:18}, {x:0,y:H-18,w:W,h:18}, {x:0,y:0,w:18,h:H}, {x:W-18,y:0,w:18,h:H});
 
       if (currentRoom === 0) {
-        // Sala de estar
-        // Parede do meio com porta
-        walls.push({x:380, y:20, w:20, h:180});
-        walls.push({x:380, y:300, w:20, h:180});
+        // === SALA 1: Entrada ===
+        // parede central com porta
+        walls.push({x:400, y:18, w:18, h:170});
+        walls.push({x:400, y:320, w:18, h:182});
 
-        // Placa de pressão
-        interactables.push({
-          type: 'plate',
-          x: 100, y: 380, w: 50, h: 50,
-          active: false,
-          id: 'plate1'
-        });
+        // móveis
+        decorations.push({type:'sofa', x:60, y:60, w:110, h:50});
+        decorations.push({type:'table', x:70, y:140, w:70, h:40});
+        decorations.push({type:'shelf', x:680, y:50, w:60, h:90});
 
-        // Alavanca
-        interactables.push({
-          type: 'lever',
-          x: 650, y: 120, w: 30, h: 40,
-          active: false,
-          id: 'lever1'
-        });
+        interactables.push({ type:'plate', x:80, y:400, w:55, h:55, active:false, id:'plate1' });
+        interactables.push({ type:'lever', x:700, y:140, w:28, h:42, active:false, id:'lever1' });
+        interactables.push({ type:'door', x:400, y:188, w:18, h:132, open:false, id:'door1', needs:['plate1','lever1'] });
 
-        // Porta (inicialmente fechada)
-        interactables.push({
-          type: 'door',
-          x: 380, y: 200, w: 20, h: 100,
-          open: false,
-          id: 'door1',
-          requires: ['plate1', 'lever1']
-        });
-      } else if (currentRoom === 1) {
-        // Cozinha
-        walls.push({x:380, y:20, w:20, h:180});
-        walls.push({x:380, y:300, w:20, h:180});
-
-        interactables.push({
-          type: 'key',
-          x: 600, y: 350, w: 30, h: 30,
-          collected: false,
-          id: 'key1'
-        });
-
-        interactables.push({
-          type: 'door',
-          x: 380, y: 200, w: 20, h: 100,
-          open: false,
-          id: 'door2',
-          requiresKey: true
-        });
-      } else if (currentRoom === 2) {
-        // Saída
-        interactables.push({
-          type: 'exit',
-          x: 650, y: 200, w: 80, h: 100,
-          id: 'exit'
-        });
+        setStatus('Um de vocês na placa… o outro na alavanca.');
       }
+      else if (currentRoom === 1) {
+        // === SALA 2: Corredor escuro ===
+        walls.push({x:280, y:18, w:18, h:200});
+        walls.push({x:280, y:320, w:18, h:182});
+        walls.push({x:520, y:18, w:18, h:150});
+        walls.push({x:520, y:280, w:18, h:222});
+
+        decorations.push({type:'crate', x:100, y:80, w:45, h:45});
+        decorations.push({type:'crate', x:160, y:90, w:40, h:40});
+        decorations.push({type:'barrel', x:700, y:380, w:40, h:50});
+
+        // dois interruptores que precisam ser ativados AO MESMO TEMPO
+        interactables.push({ type:'switch', x:80, y:200, w:36, h:36, active:false, id:'swA' });
+        interactables.push({ type:'switch', x:740, y:200, w:36, h:36, active:false, id:'swB' });
+        interactables.push({ type:'door', x:400, y:200, w:20, h:120, open:false, id:'door2', needsBoth:true });
+
+        setStatus('Dois interruptores. Ativem os dois ao mesmo tempo.');
+      }
+      else if (currentRoom === 2) {
+        // === SALA 3: Biblioteca / chave ===
+        walls.push({x:380, y:18, w:18, h:160});
+        walls.push({x:380, y:300, w:18, h:202});
+
+        decorations.push({type:'shelf', x:50, y:50, w:50, h:120});
+        decorations.push({type:'shelf', x:50, y:200, w:50, h:120});
+        decorations.push({type:'shelf', x:760, y:50, w:50, h:120});
+        decorations.push({type:'table', x:550, y:380, w:80, h:45});
+
+        interactables.push({ type:'key', x:600, y:100, w:28, h:28, collected:false, id:'key1' });
+        interactables.push({ type:'door', x:380, y:178, w:18, h:122, open:false, id:'door3', needsKey:true });
+
+        setStatus('Encontrem a chave. Só quem a tem pode abrir a porta.');
+      }
+      else if (currentRoom === 3) {
+        // === SALA 4: Timing / pressão ===
+        walls.push({x:300, y:18, w:18, h:180});
+        walls.push({x:300, y:320, w:18, h:182});
+        walls.push({x:560, y:18, w:18, h:140});
+        walls.push({x:560, y:280, w:18, h:222});
+
+        decorations.push({type:'pillar', x:180, y:100, w:30, h:80});
+        decorations.push({type:'pillar', x:680, y:300, w:30, h:80});
+
+        // placa que precisa ficar pressionada enquanto o outro corre até a saída da sala
+        interactables.push({ type:'plate', x:100, y:380, w:55, h:55, active:false, id:'plate2' });
+        interactables.push({ type:'door', x:420, y:200, w:20, h:120, open:false, id:'door4', needsPlate:'plate2' });
+
+        setStatus('Um segura a placa. O outro passa pela porta.');
+      }
+      else if (currentRoom === 4) {
+        // === SALA 5: Saída final ===
+        decorations.push({type:'exitGate', x:680, y:180, w:100, h:140});
+
+        interactables.push({ type:'exit', x:700, y:200, w:70, h:100, id:'exit' });
+
+        // último puzzle: dois alavancas finais
+        interactables.push({ type:'lever', x:100, y:120, w:28, h:42, active:false, id:'finalL1' });
+        interactables.push({ type:'lever', x:100, y:360, w:28, h:42, active:false, id:'finalL2' });
+
+        setStatus('Última sala. Ativem as duas alavancas e corram para a saída.');
+      }
+    }
+
+    function setStatus(txt) {
+      statusEl.textContent = txt;
     }
 
     function startGame() {
       document.getElementById('start-screen').classList.add('hidden');
       gameStarted = true;
+      currentRoom = 0;
+      noise = 0;
+      p1.x = 140; p1.y = 260; p1.hasKey = false; p1.hasItem = null;
+      p2.x = 200; p2.y = 260; p2.hasKey = false; p2.hasItem = null;
       buildMap();
+      updateInv();
       requestAnimationFrame(loop);
     }
 
-    function sendEmoji(emoji) {
+    function sendEmoji(emoji, who) {
       if (!gameStarted || gameOver) return;
       const span = document.createElement('span');
       span.className = 'msg';
-      span.textContent = emoji;
+      span.innerHTML = `<span class="who">${who === 'P1' ? '1' : who === 'P2' ? '2' : ''}</span>${emoji}`;
       messagesEl.appendChild(span);
+      if (messagesEl.children.length > 14) messagesEl.removeChild(messagesEl.firstChild);
       messagesEl.scrollTop = messagesEl.scrollHeight;
-      // Limitar mensagens
-      if (messagesEl.children.length > 12) {
-        messagesEl.removeChild(messagesEl.firstChild);
-      }
     }
 
     function addNoise(amount) {
+      if (gameOver) return;
       noise = Math.min(MAX_NOISE, noise + amount);
       noiseBar.style.width = noise + '%';
-      if (noise >= MAX_NOISE) {
-        lose();
-      }
+      if (noise > 70) shake = Math.max(shake, 4);
+      if (noise >= MAX_NOISE) lose();
     }
 
     function lose() {
@@ -319,217 +413,452 @@
       document.getElementById('win-screen').classList.remove('hidden');
     }
 
-    // Colisão simples AABB
-    function collides(a, b) {
-      return a.x < b.x + b.w && a.x + (a.radius*2 || a.w) > b.x &&
-             a.y < b.y + b.h && a.y + (a.radius*2 || a.h) > b.y;
+    function updateInv() {
+      inv1El.textContent = p1.hasKey ? '🔑' : (p1.hasItem || '—');
+      inv2El.textContent = p2.hasKey ? '🔑' : (p2.hasItem || '—');
     }
 
-    function playerRect(p) {
-      return { x: p.x - p.radius, y: p.y - p.radius, w: p.radius*2, h: p.radius*2 };
+    // ========== FÍSICA ==========
+    function collides(a, b) {
+      const aw = a.r ? a.r * 2 : a.w;
+      const ah = a.r ? a.r * 2 : a.h;
+      const ax = a.r ? a.x - a.r : a.x;
+      const ay = a.r ? a.y - a.r : a.y;
+      return ax < b.x + b.w && ax + aw > b.x && ay < b.y + b.h && ay + ah > b.y;
+    }
+
+    function playerBox(p) {
+      return { x: p.x - p.r, y: p.y - p.r, w: p.r * 2, h: p.r * 2 };
     }
 
     function movePlayer(p, dx, dy) {
-      const speed = 2.8;
-      let nx = p.x + dx * speed;
-      let ny = p.y + dy * speed;
+      const isSprint = p.sprint;
+      const speed = isSprint ? 4.6 : 2.6;
+      const nx = p.x + dx * speed;
+      const ny = p.y + dy * speed;
 
-      // Testar colisão com paredes
-      const test = { x: nx - p.radius, y: ny - p.radius, w: p.radius*2, h: p.radius*2 };
-      let hit = false;
-      for (const w of walls) {
-        if (collides(test, w)) { hit = true; break; }
-      }
-      // Porta fechada também bloqueia
+      const test = { x: nx - p.r, y: ny - p.r, w: p.r * 2, h: p.r * 2 };
+      let blocked = false;
+
+      for (const w of walls) if (collides(test, w)) { blocked = true; break; }
       for (const i of interactables) {
-        if (i.type === 'door' && !i.open && collides(test, i)) { hit = true; break; }
+        if (i.type === 'door' && !i.open && collides(test, i)) { blocked = true; break; }
+      }
+      for (const d of decorations) {
+        if ((d.type === 'sofa' || d.type === 'table' || d.type === 'crate' || d.type === 'barrel' || d.type === 'pillar') && collides(test, d)) {
+          blocked = true; break;
+        }
       }
 
-      if (!hit) {
+      if (!blocked) {
         p.x = nx;
         p.y = ny;
-        // Pequeno barulho ao andar
-        if (dx !== 0 || dy !== 0) addNoise(0.04);
+        if (dx !== 0 || dy !== 0) {
+          addNoise(isSprint ? 0.35 : 0.035);
+        }
+      }
+    }
+
+    function spawnParticles(x, y, color, n = 8) {
+      for (let i = 0; i < n; i++) {
+        particles.push({
+          x, y,
+          vx: (Math.random() - 0.5) * 3,
+          vy: (Math.random() - 0.5) * 3,
+          life: 30 + Math.random() * 20,
+          color
+        });
       }
     }
 
     function tryInteract(p) {
-      const pr = playerRect(p);
+      const box = playerBox(p);
       for (const obj of interactables) {
-        if (collides(pr, obj)) {
-          if (obj.type === 'plate') {
-            obj.active = true;
-            statusEl.textContent = 'Placa de pressão ativada!';
-            checkDoor();
-          } else if (obj.type === 'lever') {
-            obj.active = !obj.active;
-            addNoise(3);
-            statusEl.textContent = obj.active ? 'Alavanca puxada!' : 'Alavanca desativada';
-            checkDoor();
-          } else if (obj.type === 'key' && !obj.collected) {
-            obj.collected = true;
-            p.hasKey = true;
-            statusEl.textContent = p.name + ' pegou a chave! 🔑';
-            addNoise(2);
-          } else if (obj.type === 'door' && obj.requiresKey) {
+        if (!collides(box, obj)) continue;
+
+        if (obj.type === 'plate') {
+          // ativada pelo update
+          return;
+        }
+        if (obj.type === 'lever') {
+          obj.active = !obj.active;
+          addNoise(4);
+          spawnParticles(obj.x + 14, obj.y + 20, '#ffca28');
+          setStatus(obj.active ? 'Alavanca ativada' : 'Alavanca desativada');
+          checkProgress();
+          return;
+        }
+        if (obj.type === 'switch') {
+          obj.active = !obj.active;
+          addNoise(3.5);
+          spawnParticles(obj.x + 18, obj.y + 18, obj.active ? '#66bb6a' : '#78909c');
+          setStatus(obj.active ? 'Interruptor ligado' : 'Interruptor desligado');
+          checkProgress();
+          return;
+        }
+        if (obj.type === 'key' && !obj.collected) {
+          obj.collected = true;
+          p.hasKey = true;
+          addNoise(2);
+          spawnParticles(obj.x + 14, obj.y + 14, '#ffd54f');
+          setStatus(p.name + ' pegou a chave');
+          updateInv();
+          return;
+        }
+        if (obj.type === 'door') {
+          if (obj.needsKey) {
             if (p.hasKey) {
               obj.open = true;
-              statusEl.textContent = 'Porta destrancada!';
-              addNoise(4);
-              setTimeout(() => {
-                currentRoom = 2;
-                p1.x = 100; p1.y = 250;
-                p2.x = 160; p2.y = 250;
-                buildMap();
-              }, 800);
+              addNoise(5);
+              spawnParticles(obj.x + 9, obj.y + 60, '#8d6e63');
+              setStatus('Porta destrancada');
+              setTimeout(() => goToRoom(currentRoom + 1), 700);
             } else {
-              statusEl.textContent = 'Precisa da chave...';
-              addNoise(1);
+              setStatus('Precisa da chave…');
+              addNoise(1.5);
             }
-          } else if (obj.type === 'exit') {
+          }
+          return;
+        }
+        if (obj.type === 'exit') {
+          // só libera se as duas alavancas finais estiverem ativas
+          const l1 = interactables.find(i => i.id === 'finalL1');
+          const l2 = interactables.find(i => i.id === 'finalL2');
+          if (l1 && l2 && l1.active && l2.active) {
             win();
+          } else {
+            setStatus('As duas alavancas precisam estar ativas');
+            addNoise(1);
+          }
+          return;
+        }
+      }
+    }
+
+    function checkProgress() {
+      // Room 0
+      if (currentRoom === 0) {
+        const plate = interactables.find(i => i.id === 'plate1');
+        const lever = interactables.find(i => i.id === 'lever1');
+        const door = interactables.find(i => i.id === 'door1');
+        if (plate && lever && door && plate.active && lever.active) {
+          door.open = true;
+          setStatus('Porta aberta… passem');
+          setTimeout(() => goToRoom(1), 800);
+        }
+      }
+      // Room 1 – dois switches ao mesmo tempo
+      if (currentRoom === 1) {
+        const a = interactables.find(i => i.id === 'swA');
+        const b = interactables.find(i => i.id === 'swB');
+        const door = interactables.find(i => i.id === 'door2');
+        if (a && b && door && a.active && b.active) {
+          door.open = true;
+          setStatus('Porta liberada');
+          setTimeout(() => goToRoom(2), 700);
+        }
+      }
+      // Room 3 – placa
+      if (currentRoom === 3) {
+        const plate = interactables.find(i => i.id === 'plate2');
+        const door = interactables.find(i => i.id === 'door4');
+        if (plate && door) {
+          door.open = plate.active;
+        }
+      }
+      // Room 4 – alavancas finais só abrem o caminho mentalmente (exit checa)
+    }
+
+    function goToRoom(n) {
+      currentRoom = n;
+      p1.x = 130; p1.y = 260;
+      p2.x = 190; p2.y = 260;
+      // chave só existe na sala 2, então resetamos se avançou
+      if (n !== 2) {
+        p1.hasKey = false;
+        p2.hasKey = false;
+      }
+      buildMap();
+      updateInv();
+      spawnParticles(W/2, H/2, '#b8a0ff', 20);
+    }
+
+    function updatePlatesAndDoors() {
+      for (const obj of interactables) {
+        if (obj.type === 'plate') {
+          const on1 = collides(playerBox(p1), obj);
+          const on2 = collides(playerBox(p2), obj);
+          const was = obj.active;
+          obj.active = on1 || on2;
+          if (obj.active && !was) spawnParticles(obj.x + 27, obj.y + 27, '#66bb6a', 5);
+        }
+      }
+      checkProgress();
+
+      // se a porta da sala 3 estiver aberta e alguém passou, avança
+      if (currentRoom === 3) {
+        const door = interactables.find(i => i.id === 'door4');
+        if (door && door.open) {
+          // verifica se algum jogador está do outro lado (x > 450)
+          if (p1.x > 480 || p2.x > 480) {
+            // espera o segundo também ou libera quando um passa
+            // para simplicidade: se um passou e a placa ainda está ativa, avança quando os dois estiverem ou timeout curto
+            if ((p1.x > 480 && p2.x > 480) || (p1.x > 520 || p2.x > 520)) {
+              goToRoom(4);
+            }
           }
         }
       }
     }
 
-    function checkDoor() {
-      const plate = interactables.find(i => i.id === 'plate1');
-      const lever = interactables.find(i => i.id === 'lever1');
-      const door = interactables.find(i => i.id === 'door1');
-      if (plate && lever && door) {
-        if (plate.active && lever.active) {
-          door.open = true;
-          statusEl.textContent = 'Porta aberta! Passem...';
-          setTimeout(() => {
-            currentRoom = 1;
-            p1.x = 100; p1.y = 250;
-            p2.x = 160; p2.y = 250;
-            p1.hasKey = false; p2.hasKey = false;
-            buildMap();
-          }, 900);
+    // ========== DESENHO ==========
+    function drawDecor(d) {
+      ctx.save();
+      if (d.type === 'sofa') {
+        ctx.fillStyle = '#3a3050';
+        ctx.fillRect(d.x, d.y, d.w, d.h);
+        ctx.fillStyle = '#2a2040';
+        ctx.fillRect(d.x + 8, d.y + 8, d.w - 16, d.h - 16);
+      } else if (d.type === 'table') {
+        ctx.fillStyle = '#4a3a2a';
+        ctx.fillRect(d.x, d.y, d.w, d.h);
+        ctx.fillStyle = '#5a4a3a';
+        ctx.fillRect(d.x + 4, d.y + 4, d.w - 8, 8);
+      } else if (d.type === 'shelf') {
+        ctx.fillStyle = '#2e2a38';
+        ctx.fillRect(d.x, d.y, d.w, d.h);
+        for (let i = 0; i < 4; i++) {
+          ctx.fillStyle = `hsl(${20 + i * 30}, 30%, ${25 + i * 5}%)`;
+          ctx.fillRect(d.x + 6, d.y + 12 + i * 22, d.w - 12, 14);
         }
+      } else if (d.type === 'crate') {
+        ctx.fillStyle = '#5d4037';
+        ctx.fillRect(d.x, d.y, d.w, d.h);
+        ctx.strokeStyle = '#3e2723';
+        ctx.strokeRect(d.x + 3, d.y + 3, d.w - 6, d.h - 6);
+      } else if (d.type === 'barrel') {
+        ctx.fillStyle = '#6d4c41';
+        ctx.beginPath();
+        ctx.ellipse(d.x + d.w/2, d.y + d.h/2, d.w/2, d.h/2, 0, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (d.type === 'pillar') {
+        ctx.fillStyle = '#3a3a48';
+        ctx.fillRect(d.x, d.y, d.w, d.h);
+        ctx.fillStyle = '#4a4a5a';
+        ctx.fillRect(d.x - 4, d.y, d.w + 8, 12);
+        ctx.fillRect(d.x - 4, d.y + d.h - 12, d.w + 8, 12);
+      } else if (d.type === 'exitGate') {
+        ctx.fillStyle = '#1b5e20';
+        ctx.fillRect(d.x, d.y, d.w, d.h);
+        ctx.fillStyle = '#2e7d32';
+        ctx.fillRect(d.x + 10, d.y + 15, d.w - 20, d.h - 30);
+        ctx.fillStyle = '#a5d6a7';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('SAÍDA', d.x + d.w/2, d.y + d.h/2 + 5);
       }
+      ctx.restore();
     }
 
-    // Manter placa ativa só se alguém estiver em cima
-    function updatePlates() {
-      for (const obj of interactables) {
-        if (obj.type === 'plate') {
-          const pr1 = playerRect(p1);
-          const pr2 = playerRect(p2);
-          obj.active = collides(pr1, obj) || collides(pr2, obj);
-        }
+    function drawPlayer(p) {
+      // sombra
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y + p.r + 2, p.r * 0.9, p.r * 0.35, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // corpo
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // olho (direção simples)
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(p.x + 4, p.y - 3, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#111';
+      ctx.beginPath();
+      ctx.arc(p.x + 5, p.y - 3, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+
+      // nome
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(p.name, p.x, p.y - p.r - 8);
+
+      if (p.hasKey) {
+        ctx.font = '15px serif';
+        ctx.fillText('🔑', p.x + 16, p.y - 8);
       }
-      checkDoor();
     }
 
     function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      if (shake > 0) {
+        ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
+        shake *= 0.85;
+      }
 
-      // Chão
-      ctx.fillStyle = '#1a1a28';
-      ctx.fillRect(0, 0, 800, 500);
+      // fundo
+      ctx.fillStyle = '#0c0c14';
+      ctx.fillRect(0, 0, W, H);
 
-      // Grade sutil
-      ctx.strokeStyle = '#222233';
+      // grade bem sutil
+      ctx.strokeStyle = 'rgba(40,40,60,0.25)';
       ctx.lineWidth = 1;
-      for (let x = 0; x < 800; x += 40) {
-        ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,500); ctx.stroke();
+      for (let x = 0; x < W; x += 40) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
       }
-      for (let y = 0; y < 500; y += 40) {
-        ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(800,y); ctx.stroke();
+      for (let y = 0; y < H; y += 40) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
       }
 
-      // Paredes
-      ctx.fillStyle = '#2e2e42';
-      walls.forEach(w => ctx.fillRect(w.x, w.y, w.w, w.h));
+      // decorações
+      decorations.forEach(drawDecor);
 
-      // Interagíveis
+      // paredes
+      ctx.fillStyle = '#1e1e2c';
+      walls.forEach(w => {
+        ctx.fillRect(w.x, w.y, w.w, w.h);
+      });
+      // borda clara nas paredes
+      ctx.strokeStyle = 'rgba(80,70,110,0.4)';
+      ctx.lineWidth = 1;
+      walls.forEach(w => ctx.strokeRect(w.x + 0.5, w.y + 0.5, w.w - 1, w.h - 1));
+
+      // interagíveis
       interactables.forEach(obj => {
         if (obj.type === 'plate') {
+          ctx.fillStyle = obj.active ? '#43a047' : '#37474f';
+          ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
+          ctx.strokeStyle = obj.active ? '#a5d6a7' : '#546e7a';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(obj.x + 2, obj.y + 2, obj.w - 4, obj.h - 4);
+          ctx.fillStyle = 'rgba(255,255,255,0.6)';
+          ctx.font = '10px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('PLACA', obj.x + obj.w/2, obj.y + obj.h/2 + 3);
+        }
+        else if (obj.type === 'lever') {
+          ctx.fillStyle = obj.active ? '#ffb300' : '#546e7a';
+          ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
+          ctx.fillStyle = '#fff';
+          ctx.font = '10px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(obj.active ? 'ON' : 'OFF', obj.x + obj.w/2, obj.y - 6);
+        }
+        else if (obj.type === 'switch') {
+          ctx.beginPath();
+          ctx.arc(obj.x + obj.w/2, obj.y + obj.h/2, obj.w/2, 0, Math.PI * 2);
           ctx.fillStyle = obj.active ? '#66bb6a' : '#455a64';
+          ctx.fill();
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+        else if (obj.type === 'door' && !obj.open) {
+          ctx.fillStyle = '#4e342e';
           ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
-          ctx.fillStyle = '#fff';
-          ctx.font = '12px sans-serif';
-          ctx.fillText('PLACA', obj.x + 6, obj.y + 28);
-        } else if (obj.type === 'lever') {
-          ctx.fillStyle = obj.active ? '#ffca28' : '#78909c';
-          ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
-          ctx.fillStyle = '#fff';
-          ctx.font = '11px sans-serif';
-          ctx.fillText('ALAV.', obj.x - 2, obj.y - 6);
-        } else if (obj.type === 'door') {
-          if (!obj.open) {
-            ctx.fillStyle = '#5d4037';
-            ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
-          }
-        } else if (obj.type === 'key' && !obj.collected) {
-          ctx.font = '28px serif';
-          ctx.fillText('🔑', obj.x, obj.y + 28);
-        } else if (obj.type === 'exit') {
-          ctx.fillStyle = '#2e7d32';
-          ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
-          ctx.fillStyle = '#fff';
-          ctx.font = 'bold 16px sans-serif';
-          ctx.fillText('SAÍDA', obj.x + 12, obj.y + 55);
+          ctx.fillStyle = '#3e2723';
+          ctx.fillRect(obj.x + 3, obj.y + 10, obj.w - 6, obj.h - 20);
+          // maçaneta
+          ctx.fillStyle = '#ffd54f';
+          ctx.beginPath();
+          ctx.arc(obj.x + obj.w - 6, obj.y + obj.h/2, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        else if (obj.type === 'key' && !obj.collected) {
+          ctx.font = '26px serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('🔑', obj.x + 14, obj.y + 24);
+          // brilho
+          ctx.globalAlpha = 0.3 + Math.sin(frame * 0.1) * 0.2;
+          ctx.beginPath();
+          ctx.arc(obj.x + 14, obj.y + 14, 18, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffd54f';
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+        else if (obj.type === 'exit') {
+          // já desenhado como decoration
         }
       });
 
-      // Jogadores
-      [p1, p2].forEach(p => {
+      // partículas
+      particles = particles.filter(pt => {
+        pt.x += pt.vx;
+        pt.y += pt.vy;
+        pt.life--;
+        ctx.globalAlpha = pt.life / 40;
+        ctx.fillStyle = pt.color;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
+        ctx.arc(pt.x, pt.y, 2.5, 0, Math.PI * 2);
         ctx.fill();
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        // Nome
-        ctx.fillStyle = '#fff';
-        ctx.font = '12px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(p.name, p.x, p.y - 22);
-
-        // Chave
-        if (p.hasKey) {
-          ctx.font = '16px serif';
-          ctx.fillText('🔑', p.x + 18, p.y - 10);
-        }
+        ctx.globalAlpha = 1;
+        return pt.life > 0;
       });
 
-      // Indicador de sala
-      ctx.fillStyle = '#c9b1ff';
-      ctx.font = '14px sans-serif';
+      // jogadores
+      drawPlayer(p1);
+      drawPlayer(p2);
+
+      // nome da sala
+      const names = ['Entrada', 'Corredor', 'Biblioteca', 'Câmara de Pressão', 'O Portão'];
+      ctx.fillStyle = 'rgba(184,160,255,0.7)';
+      ctx.font = '13px sans-serif';
       ctx.textAlign = 'left';
-      const roomNames = ['Sala de Estar', 'Cozinha', 'Corredor da Saída'];
-      ctx.fillText(roomNames[currentRoom] || '', 30, 40);
+      ctx.fillText(names[currentRoom] || '', 28, 38);
+
+      // vinheta
+      const grd = ctx.createRadialGradient(W/2, H/2, H*0.3, W/2, H/2, H*0.85);
+      grd.addColorStop(0, 'rgba(0,0,0,0)');
+      grd.addColorStop(1, 'rgba(0,0,0,0.55)');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, W, H);
+
+      // aviso de barulho alto
+      if (noise > 65) {
+        ctx.fillStyle = `rgba(198,40,40,${0.08 + Math.sin(frame * 0.2) * 0.05})`;
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      ctx.restore();
     }
 
+    // ========== LOOP ==========
     function loop() {
       if (!gameStarted || gameOver) return;
+      frame++;
 
-      // Movimento
+      // input
+      p1.sprint = !!(keys['Shift']);
+      p2.sprint = !!(keys['Control']);
+
       let dx1 = 0, dy1 = 0;
       if (keys['w'] || keys['W']) dy1 = -1;
       if (keys['s'] || keys['S']) dy1 = 1;
       if (keys['a'] || keys['A']) dx1 = -1;
       if (keys['d'] || keys['D']) dx1 = 1;
-      movePlayer(p1, dx1, dy1);
+      if (dx1 || dy1) movePlayer(p1, dx1, dy1);
 
       let dx2 = 0, dy2 = 0;
       if (keys['ArrowUp']) dy2 = -1;
       if (keys['ArrowDown']) dy2 = 1;
       if (keys['ArrowLeft']) dx2 = -1;
       if (keys['ArrowRight']) dx2 = 1;
-      movePlayer(p2, dx2, dy2);
+      if (dx2 || dy2) movePlayer(p2, dx2, dy2);
 
-      updatePlates();
+      updatePlatesAndDoors();
 
-      // Decair barulho lentamente
+      // decaimento do barulho
       if (noise > 0) {
-        noise = Math.max(0, noise - 0.08);
+        noise = Math.max(0, noise - 0.07);
         noiseBar.style.width = noise + '%';
       }
 
@@ -537,7 +866,6 @@
       requestAnimationFrame(loop);
     }
 
-    // Eventos de teclado
     window.addEventListener('keydown', e => {
       keys[e.key] = true;
       if (!gameStarted || gameOver) return;
@@ -556,9 +884,8 @@
       keys[e.key] = false;
     });
 
-    // Prevenir scroll com setas
     window.addEventListener('keydown', e => {
-      if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) {
+      if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','Shift','Control'].includes(e.key)) {
         e.preventDefault();
       }
     });

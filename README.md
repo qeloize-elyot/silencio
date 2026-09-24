@@ -1,34 +1,48 @@
 # O Jogo do Silêncio 🤫
 
-Jogo cooperativo local (2 jogadores no mesmo computador) onde **vocês não podem se comunicar por voz ou texto**.
+Jogo cooperativo local para **2 jogadores no mesmo computador**.
 
-A única forma de se entender é pelo painel de **emojis**.
+A regra é simples e cruel:
+
+> **Vocês não podem se comunicar por voz nem por texto.**  
+> Só podem usar o painel de emojis.
+
+Qualquer barulho alto atrai o **Guardião do Silêncio**.
+
+---
 
 ## Como jogar
 
-1. Abra o arquivo `index.html` no navegador (Chrome, Firefox, Edge...)
+1. Abra o `index.html` no navegador (Chrome, Firefox, Edge…)
 2. Dois jogadores no mesmo teclado:
-   - **Jogador 1 (azul)**: `W A S D` para mover + `E` para interagir
-   - **Jogador 2 (vermelho)**: `↑ ← ↓ →` para mover + `Enter` para interagir
-3. Use o painel de emojis na parte de baixo da tela para se comunicar.
-4. Não faça barulho demais! O medidor de barulho sobe se vocês correrem ou errarem ações.
-5. Objetivo: escapar da casa sem atrair o Guardião do Silêncio.
 
-## Controles rápidos
+| Ação              | Jogador 1 (azul)     | Jogador 2 (vermelho) |
+|-------------------|----------------------|----------------------|
+| Mover             | `W A S D`            | Setas                |
+| Correr (barulhento)| `Shift`              | `Ctrl` direito       |
+| Interagir         | `E`                  | `Enter`              |
+| Comunicar         | Clique nos emojis    | Clique nos emojis    |
 
-| Ação              | Jogador 1 | Jogador 2     |
-|-------------------|-----------|---------------|
-| Mover             | W A S D   | Setas         |
-| Interagir         | E         | Enter         |
-| Enviar emoji      | Clique nos botões | Clique nos botões |
-
-## Regras do Silêncio
-
-- Vocês **não podem** falar ou digitar mensagens.
-- Só emojis são permitidos.
-- Barulho alto = morte.
-
-Divirtam-se... em silêncio. 🤫
+3. Use **apenas** os emojis para se entender.
+4. Andar faz pouco barulho. Correr faz **muito**.
+5. Objetivo: escapar da casa sem encher o medidor de barulho.
 
 ---
-Feito com ❤️ para o desafio do Grok.
+
+## O que tem no jogo
+
+- 5 salas com puzzles de cooperação
+- Medidor de barulho que sobe e desce
+- Painel de emojis como único meio de comunicação
+- Atmosfera sombria e tensa
+- Feedback visual claro (placas, alavancas, portas, itens)
+- Tela de vitória e derrota
+
+---
+
+## Dica
+
+Falem com os olhos e com os emojis.  
+O silêncio é a única arma de vocês.
+
+Divirtam-se… em silêncio. 🤫
